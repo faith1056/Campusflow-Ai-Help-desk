@@ -35,7 +35,9 @@ body {
 }
 
 button,
-input {
+input,
+textarea,
+select {
     font: inherit;
 }
 
@@ -472,6 +474,116 @@ h1 > span {
     gap: 12px;
 }
 
+/* ---------- New ticket form ---------- */
+
+.ticket-form-panel {
+    margin-bottom: 20px;
+}
+
+#ticket-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding: 22px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group label {
+    color: #a6b3c6;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 12px 14px;
+    color: var(--text);
+    background: #080e16;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    outline: none;
+    transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.form-group textarea {
+    min-height: 130px;
+    resize: vertical;
+    line-height: 1.6;
+}
+
+.form-group select {
+    cursor: pointer;
+}
+
+.form-group select option {
+    color: var(--text);
+    background: var(--surface);
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+    color: #63738a;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    border-color: var(--teal);
+    box-shadow: 0 0 0 3px #45e0c01a;
+}
+
+#diagnose-button {
+    align-self: flex-start;
+}
+
+#diagnose-button:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
+#diagnosis-message {
+    min-height: 18px;
+    margin: 0;
+    color: var(--green);
+    font-size: 12px;
+}
+
+#diagnosis-results {
+    padding: 16px;
+    background: #ffffff04;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+}
+
+#diagnosis-results[hidden] {
+    display: none;
+}
+
+#diagnosis-results h3 {
+    margin: 0 0 10px;
+    font-size: 13px;
+    letter-spacing: -0.2px;
+}
+
+#diagnosis-suggestions {
+    margin: 0;
+    color: #c9d5e5;
+    font-family: "DM Sans", sans-serif;
+    font-size: 12px;
+    line-height: 1.7;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+/* ---------- Command center ---------- */
+
 .terminal-symbol {
     display: grid;
     place-items: center;
@@ -644,6 +756,8 @@ h1 > span {
     gap: 8px;
 }
 
+/* ---------- AI insights ---------- */
+
 .sparkle {
     color: var(--teal);
     font-size: 23px;
@@ -728,6 +842,8 @@ h1 > span {
 .insight-note span {
     color: var(--amber);
 }
+
+/* ---------- Tickets table ---------- */
 
 .tickets-panel {
     margin-bottom: 20px;
@@ -866,6 +982,8 @@ td {
     padding: 0 5px;
     color: var(--teal);
 }
+
+/* ---------- Responsive ---------- */
 
 @media (min-width: 1500px) {
     .main-content {
@@ -1006,6 +1124,10 @@ td {
     }
 
     .panel-header {
+        padding: 16px;
+    }
+
+    #ticket-form {
         padding: 16px;
     }
 
