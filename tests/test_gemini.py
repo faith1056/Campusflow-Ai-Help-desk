@@ -1,15 +1,42 @@
+import unittest
+from unittest.mock import Mock, patch
+
 from ai.gemini import (
     get_gemini_suggestions,
     GeminiProviderError,
 )
 
-description = "My laptop cannot connect to the campus Wi-Fi."
 
-try:
-    suggestions = get_gemini_suggestions(description)
+class TestGeminiProvider(unittest.TestCase):
 
-    print("\nGemini suggestions:")
-    print(suggestions)
+    @patch("ai.gemini.requests.post")
+    def test_returns_ai_suggestions(self, mock_post):
+        mock_response = Mock()
+        mock_response.json.return_value = {
+            "candidates": [
+                {
+                    "content": {
+                        "parts": [
+                            {"text": "Check the Wi-Fi settings and restart the laptop."}
+                        ]
+                    }
+                }
+            ]
+        }
+        mock_response.raise_for_status.return_value = None
+        mock_post.return_value = mock_response
 
-except GeminiProviderError as error:
-    print(f"\nGemini error: {error}")
+        result = get_gemini_suggestions(
+            "My laptop cannot connect to the campus Wi-Fi."
+        )
+
+        self.assertIn("Check the Wi-Fi settings", result)
+        mock_post.assert_called_once()
+
+    def test_rejects_empty_description(self):
+        with self.assertRaises((ValueError, GeminiProviderError)):
+            get_gemini_suggestions("   ")
+
+
+if __name__ == "__main__":
+    unittest.main()

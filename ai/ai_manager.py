@@ -2,10 +2,12 @@ from ai.gemini import (
     get_gemini_suggestions,
     GeminiProviderError,
 )
+
 from ai.groq import (
     get_groq_suggestions,
     GroqProviderError,
 )
+
 from ai.openrouter import (
     get_openrouter_suggestions,
     OpenRouterProviderError,
@@ -24,12 +26,10 @@ class AIManagerError(Exception):
 
 
 def get_suggestions(provider, description):
-    """Get suggestions from the provider selected by the user."""
+    """Get troubleshooting suggestions from the selected AI provider."""
 
     if not isinstance(provider, str):
-        raise ValueError(
-            "Provider must be a string."
-        )
+        raise ValueError("Provider must be a string.")
 
     provider = provider.strip().lower()
 
@@ -42,9 +42,7 @@ def get_suggestions(provider, description):
         )
 
     if not isinstance(description, str) or not description.strip():
-        raise ValueError(
-            "Ticket description cannot be empty."
-        )
+        raise ValueError("Ticket description cannot be empty.")
 
     try:
         return PROVIDERS[provider](description)
