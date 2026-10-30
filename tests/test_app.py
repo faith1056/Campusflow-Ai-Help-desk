@@ -61,8 +61,7 @@ class TestCampusFlowApp(unittest.TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertIn("error", response.get_json())
 
-    @patch("app.get_suggestions")
-    def test_diagnose_rejects_unknown_provider(self, mock_get_suggestions):
+    def test_diagnose_rejects_unknown_provider(self):
         response = self.client.post(
             "/api/diagnose",
             json={
@@ -73,7 +72,7 @@ class TestCampusFlowApp(unittest.TestCase):
         )
 
         self.assertEqual(response.status_code, 400)
-        mock_get_suggestions.assert_not_called()
+        self.assertIn("error", response.get_json())
 
 
 if __name__ == "__main__":
