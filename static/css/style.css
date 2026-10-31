@@ -1181,6 +1181,7 @@ td {
 }
 
 /* ---------- Ticket status dropdown ---------- */
+
 .status-select {
     padding: 5px 9px;
     border: 1px solid #f5bd6520;
@@ -1213,23 +1214,26 @@ td {
     color: var(--text);
     background: var(--surface);
 }
+
 /* ---------- Ticket detail dialog ---------- */
+
 .ticket-link {
     max-width: 320px;
     padding: 0;
     overflow: hidden;
     border: 0;
-    color: var(--text);
+    color: var(--teal);
     background: none;
     font-weight: 600;
     text-align: left;
+    text-decoration: underline;
+    text-underline-offset: 3px;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
 .ticket-link:hover {
-    color: var(--teal);
-    text-decoration: underline;
+    color: #70edd4;
 }
 
 .ticket-dialog {
