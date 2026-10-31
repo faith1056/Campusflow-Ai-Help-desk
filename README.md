@@ -1,23 +1,24 @@
- CampusFlow AI Help Desk
+# CampusFlow AI Help Desk
 
-A smarter way to investigate campus IT issues. CampusFlow is a Flask web app where you describe a problem, pick an AI provider, and get practical troubleshooting steps. Each request is saved as a ticket.
+A smarter way to investigate campus IT issues. CampusFlow is a Flask web app where you describe a problem, pick an AI provider, and get practical troubleshooting steps. Each request is saved as a ticket you can track and revisit.
 
-Live demo:  https://campusflow-ai-help-desk.onrender.com
+**Live demo:** https://campusflow-ai-help-desk.onrender.com
 
- The demo is password protected. It runs on Render's free tier, so it sleeps after about 15 minutes of inactivity and the first load can take up to a minute.
+> The demo is password protected. It runs on Render's free tier, so it sleeps after about 15 minutes of inactivity and the first load can take up to a minute.
 
 ## Features
 
 - Dashboard with ticket statistics and AI provider status
 - AI-powered troubleshooting from Google Gemini, Groq, or OpenRouter
 - Ticket creation and a recent tickets table
+- Ticket status tracking (Open, In progress, Resolved)
+- Ticket detail view with the full description and AI suggestions
 - Persistent ticket storage in PostgreSQL (Neon)
 - Password login (HTTP Basic authentication)
-- Command Center, an interactive in-app terminal
+- Command Center, an interactive in-app terminal (`help`, `list`, `view T001`, `refresh`, `clear`)
 - Responsive dark interface
-- Ticket detail view with full descriptions and AI suggestions
-- Command Center `view T001` command
-  Tech stack
+
+## Tech stack
 
 - Python and Flask
 - Gunicorn for production
@@ -25,11 +26,11 @@ Live demo:  https://campusflow-ai-help-desk.onrender.com
 - Gemini, Groq, and OpenRouter APIs
 - HTML, CSS, and vanilla JavaScript
 
-   Project structure
+## Project structure
 
-
+```
 Campusflow-Ai-Help-desk/
-├── ai/                  AI provider integrations
+├── ai/                 # AI provider integrations
 │   ├── ai_manager.py
 │   ├── gemini.py
 │   ├── groq.py
@@ -48,7 +49,7 @@ Campusflow-Ai-Help-desk/
 └── tickets.json        # used only when DATABASE_URL is not set
 ```
 
-   Environment variables
+## Environment variables
 
 | Variable | Required | Purpose |
 | --- | --- | --- |
@@ -59,45 +60,47 @@ Campusflow-Ai-Help-desk/
 | `APP_USERNAME` | No | Login username (defaults to `admin`) |
 | `APP_PASSWORD` | In production | Login password. If it is not set, the app has no login. |
 
-Never commit real values. The `.env` file is listed in `gitignore`.
+Never commit real values. The `.env` file is listed in `.gitignore`.
 
 ## Run locally
 
 1. Clone the repository:
-   
+   ```
    git clone https://github.com/faith1056/Campusflow-Ai-Help-desk.git
    cd Campusflow-Ai-Help-desk
-
+   ```
 
 2. Create and activate a virtual environment:
-   
+   ```
    python -m venv .venv
    source .venv/bin/activate
-   
-   On Windows, use  .venv\Scripts\activate`.
+   ```
+   On Windows, use `.venv\Scripts\activate`.
 
 3. Install dependencies:
-   
+   ```
    pip install -r requirements.txt
-   
+   ```
 
-4. Create a  .env file in the project root:
-   
+4. Create a `.env` file in the project root:
+   ```
    GEMINI_API_KEY=your_key_here
    GROQ_API_KEY=your_key_here
    OPENROUTER_API_KEY=your_key_here
-   
+   ```
    Leave out `DATABASE_URL` and `APP_PASSWORD` for local development. Tickets are then saved to `tickets.json` and no login is required.
 
 5. Start the app:
-   
+   ```
    python app.py
-   
+   ```
    Then open http://127.0.0.1:5000.
 
 ## Run the tests
-python -m unittest discover tests
 
+```
+python -m unittest discover tests
+```
 
 The tests always use the JSON file and never touch the database.
 
@@ -112,29 +115,23 @@ The tests always use the JSON file and never touch the database.
 5. Under **Environment**, add `GEMINI_API_KEY`, `GROQ_API_KEY`, `OPENROUTER_API_KEY`, `DATABASE_URL`, `APP_USERNAME`, and `APP_PASSWORD`.
 6. Deploy. With Auto-Deploy set to On Commit, every push to `main` redeploys. The `tickets` table is created automatically on first use.
 
- Known limitations
+## Known limitations
 
 - The login is one shared username and password, not per-user accounts.
-- AI recommendations are suggestions, not verified diagnoses.- Ticket status tracking (Open, In progress, Resolved)
-
+- AI recommendations are suggestions, not verified diagnoses.
+- Tickets cannot be deleted from the interface yet.
 
 ## Roadmap
 
 - [x] Password login
 - [x] Persistent database storage
-- [x] Ticket status updates (open, in progress, resolved)
+- [x] Ticket status updates (Open, In progress, Resolved)
+- [x] Ticket detail view with full AI suggestions
 - [x] Favicon
 - [ ] Delete tickets
-- [ ] Ticket detail view with full AI suggestions
 - [ ] Search and filter tickets
 - [ ] Per-user accounts
-- [x] Ticket detail view with full AI suggestions
-
-
 
 ## Author
 
 Built by [faith1056](https://github.com/faith1056).
-
-
-https://campusflow-ai-help-desk.onrender.com
