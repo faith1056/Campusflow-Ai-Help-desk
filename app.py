@@ -1,10 +1,44 @@
-from flask import Flask, render_template, request, jsonify
+import hmac
+import os
+
+from flask import Flask, Response, render_template, request, jsonify
 
 from ai.ai_manager import get_suggestions, AIManagerError
 from storage.tickets import load_tickets, save_ticket
 
 
 app = Flask(__name__)
+
+
+@app.before_request
+def require_login():
+    # Skip auth in tests and when no password is configured (local dev)
+    if app.config.get("TESTING"):
+        return None
+
+    password = os.getenv("APP_PASSWORD")
+    if not password:
+        return None
+
+    # Let Render's HEAD / port check through
+    if request.method == "HEAD" and request.path == "/":
+        return None
+
+    username = os.getenv("APP_USERNAME", "admin")
+    auth = request.authorization
+
+    if (
+        auth
+        and hmac.compare_digest((auth.username or "").encode(), username.encode())
+        and hmac.compare_digest((auth.password or "").encode(), password.encode())
+    ):
+        return None
+
+    return Response(
+        "Login required",
+        401,
+        {"WWW-Authenticate": 'Basic realm="CampusFlow"'},
+    )
 
 
 @app.route("/api/provider-status", methods=["GET"])
@@ -44,6 +78,8 @@ def get_tickets():
         return jsonify({
             "error": "Unable to load tickets."
         }), 500
+
+
 @app.route("/api/diagnose", methods=["POST"])
 def diagnose_ticket():
     data = request.get_json(silent=True)
