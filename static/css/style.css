@@ -1179,3 +1179,37 @@ td {
         font-size: 9px;
     }
 }
+
+/* ---------- Ticket status dropdown ---------- */
+.status-select {
+    padding: 5px 9px;
+    border: 1px solid #f5bd6520;
+    border-radius: 6px;
+    color: var(--amber);
+    background: #f5bd650a;
+    font-size: 10px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.status-select.in-progress {
+    color: #91baff;
+    border-color: #91baff20;
+    background: #91baff08;
+}
+
+.status-select.resolved {
+    color: var(--green);
+    border-color: #77e5a420;
+    background: #77e5a408;
+}
+
+.status-select:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
+.status-select option {
+    color: var(--text);
+    background: var(--surface);
+}
