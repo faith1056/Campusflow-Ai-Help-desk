@@ -114,17 +114,22 @@ The tests always use the JSON file and never touch the database.
  Known limitations
 
 - The login is one shared username and password, not per-user accounts.
-- AI recommendations are suggestions, not verified diagnoses.
-- Tickets have no status updates yet (every ticket shows as Open).
+- AI recommendations are suggestions, not verified diagnoses.- Ticket status tracking (Open, In progress, Resolved)
+
 
 ## Roadmap
 
 - [x] Password login
 - [x] Persistent database storage
-- [ ] Ticket status updates (open, in progress, resolved)
+- [x] Ticket status updates (open, in progress, resolved)
+- [x] Favicon
+- [ ] Delete tickets
+- [ ] Ticket detail view with full AI suggestions
+- [ ] Search and filter tickets
 - [ ] Per-user accounts
-- [ ] Favicon and further UI polish
-
 ## Author
 
 Built by [faith1056](https://github.com/faith1056).
+
+
+https://campusflow-ai-help-desk.onrender.com
