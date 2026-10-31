@@ -1,5 +1,8 @@
 const TICKET_STATUSES = ["Open", "In progress", "Resolved"];
 
+// Tickets from the most recent load, used by the detail view.
+let loadedTickets = [];
+
 
 // Check how many AI providers have API keys configured.
 async function loadProviderStatus() {
@@ -39,6 +42,122 @@ function statusClass(status) {
     }
 
     return "open";
+}
+
+
+// Create one labelled section inside the ticket dialog.
+function createDialogSection(label, text, className) {
+    const section = document.createElement("section");
+    section.className = "ticket-dialog-section";
+
+    const heading = document.createElement("h3");
+    heading.textContent = label;
+
+    const body = document.createElement("p");
+    body.className = className;
+    body.textContent = text;
+
+    section.append(heading, body);
+    return section;
+}
+
+
+// Return the ticket detail dialog, creating it the first time.
+function getTicketDialog() {
+    let dialog = document.getElementById("ticket-dialog");
+
+    if (dialog) {
+        return dialog;
+    }
+
+    dialog = document.createElement("dialog");
+    dialog.id = "ticket-dialog";
+    dialog.className = "ticket-dialog";
+    dialog.setAttribute("aria-labelledby", "ticket-dialog-title");
+
+    // Clicking the dark backdrop closes the dialog.
+    dialog.addEventListener("click", (event) => {
+        if (event.target === dialog) {
+            dialog.close();
+        }
+    });
+
+    document.body.appendChild(dialog);
+    return dialog;
+}
+
+
+// Show the full details of a ticket.
+function openTicketDialog(ticketId) {
+    const ticket = loadedTickets.find((item) => item.id === ticketId);
+
+    if (!ticket) {
+        return false;
+    }
+
+    const dialog = getTicketDialog();
+    dialog.replaceChildren();
+
+    const header = document.createElement("div");
+    header.className = "ticket-dialog-header";
+
+    const titleGroup = document.createElement("div");
+
+    const eyebrow = document.createElement("div");
+    eyebrow.className = "eyebrow";
+    eyebrow.textContent = `TICKET ${ticket.id || "N/A"}`;
+
+    const title = document.createElement("h2");
+    title.id = "ticket-dialog-title";
+    title.textContent = ticket.title || "Untitled";
+
+    titleGroup.append(eyebrow, title);
+
+    const closeButton = document.createElement("button");
+    closeButton.type = "button";
+    closeButton.className = "secondary-button";
+    closeButton.textContent = "Close";
+    closeButton.addEventListener("click", () => dialog.close());
+
+    header.append(titleGroup, closeButton);
+
+    const meta = document.createElement("div");
+    meta.className = "ticket-dialog-meta";
+
+    const status = ticket.status || "Open";
+
+    const providerTag = document.createElement("span");
+    providerTag.className = "ticket-dialog-tag";
+    providerTag.textContent = `AI provider: ${ticket.ai_provider || "N/A"}`;
+
+    const statusTag = document.createElement("span");
+    statusTag.className = `ticket-dialog-tag ${statusClass(status)}`;
+    statusTag.textContent = `Status: ${status}`;
+
+    meta.append(providerTag, statusTag);
+
+    dialog.append(
+        header,
+        meta,
+        createDialogSection(
+            "Problem description",
+            ticket.description || "No description saved.",
+            "ticket-dialog-text"
+        ),
+        createDialogSection(
+            "AI troubleshooting suggestions",
+            ticket.ai_suggestions || "No AI suggestions saved.",
+            "ticket-dialog-text"
+        )
+    );
+
+    if (typeof dialog.showModal === "function") {
+        dialog.showModal();
+    } else {
+        dialog.setAttribute("open", "");
+    }
+
+    return true;
 }
 
 
@@ -133,6 +252,8 @@ async function loadTickets() {
             throw new Error("Invalid ticket data received.");
         }
 
+        loadedTickets = tickets;
+
         tableBody.replaceChildren();
 
         if (tickets.length === 0) {
@@ -149,17 +270,26 @@ async function loadTickets() {
             tickets.forEach((ticket) => {
                 const row = document.createElement("tr");
 
-                const values = [
-                    ticket.id || "N/A",
-                    ticket.title || "Untitled",
-                    ticket.ai_provider || "N/A"
-                ];
+                const idCell = document.createElement("td");
+                idCell.textContent = ticket.id || "N/A";
 
-                values.forEach((value) => {
-                    const cell = document.createElement("td");
-                    cell.textContent = value;
-                    row.appendChild(cell);
+                const titleCell = document.createElement("td");
+                const titleButton = document.createElement("button");
+
+                titleButton.type = "button";
+                titleButton.className = "ticket-link";
+                titleButton.textContent = ticket.title || "Untitled";
+                titleButton.title = "View ticket details";
+                titleButton.addEventListener("click", () => {
+                    openTicketDialog(ticket.id);
                 });
+
+                titleCell.appendChild(titleButton);
+
+                const providerCell = document.createElement("td");
+                providerCell.textContent = ticket.ai_provider || "N/A";
+
+                row.append(idCell, titleCell, providerCell);
 
                 const statusCell = document.createElement("td");
                 statusCell.appendChild(createStatusSelect(ticket));
@@ -261,11 +391,22 @@ async function handleCommand(command) {
 
     printTerminalMessage(`> ${command}`, "command");
 
+    if (normalizedCommand.startsWith("view ")) {
+        const ticketId = normalizedCommand.slice(5).trim().toUpperCase();
+
+        if (!openTicketDialog(ticketId)) {
+            printTerminalMessage(`Ticket ${ticketId} was not found.`, "error");
+        }
+
+        return;
+    }
+
     switch (normalizedCommand) {
         case "help":
-            printTerminalMessage("Available commands: help, list, refresh, clear");
+            printTerminalMessage("Available commands: help, list, view, refresh, clear");
             printTerminalMessage("help    - Show available commands.");
             printTerminalMessage("list    - Display saved tickets.");
+            printTerminalMessage("view ID - Open a ticket, e.g. view T001.");
             printTerminalMessage("refresh - Reload tickets and provider status.");
             printTerminalMessage("clear   - Clear terminal output.");
             break;
