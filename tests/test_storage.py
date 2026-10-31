@@ -1,4 +1,5 @@
 import json
+import os
 import tempfile
 import unittest
 from pathlib import Path
@@ -19,7 +20,13 @@ class TestTicketStorage(unittest.TestCase):
         )
         self.file_patcher.start()
 
+        # Always use the JSON file in tests, never the real database
+        self.env_patcher = patch.dict(os.environ)
+        self.env_patcher.start()
+        os.environ.pop("DATABASE_URL", None)
+
     def tearDown(self):
+        self.env_patcher.stop()
         self.file_patcher.stop()
         self.temp_directory.cleanup()
 
