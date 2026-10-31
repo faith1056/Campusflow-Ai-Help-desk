@@ -1213,3 +1213,111 @@ td {
     color: var(--text);
     background: var(--surface);
 }
+/* ---------- Ticket detail dialog ---------- */
+.ticket-link {
+    max-width: 320px;
+    padding: 0;
+    overflow: hidden;
+    border: 0;
+    color: var(--text);
+    background: none;
+    font-weight: 600;
+    text-align: left;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ticket-link:hover {
+    color: var(--teal);
+    text-decoration: underline;
+}
+
+.ticket-dialog {
+    width: min(680px, calc(100vw - 32px));
+    max-height: calc(100vh - 64px);
+    padding: 24px;
+    overflow-y: auto;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    background: var(--surface);
+}
+
+.ticket-dialog::backdrop {
+    background: #04070dcc;
+}
+
+.ticket-dialog-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.ticket-dialog-header h2 {
+    margin: 0;
+    font-size: 20px;
+    letter-spacing: -0.5px;
+    overflow-wrap: anywhere;
+}
+
+.ticket-dialog-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.ticket-dialog-tag {
+    padding: 5px 9px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: #c4d0df;
+    background: #ffffff05;
+    font-size: 11px;
+}
+
+.ticket-dialog-tag.open {
+    color: var(--amber);
+    border-color: #f5bd6520;
+    background: #f5bd650a;
+}
+
+.ticket-dialog-tag.in-progress {
+    color: #91baff;
+    border-color: #91baff20;
+    background: #91baff08;
+}
+
+.ticket-dialog-tag.resolved {
+    color: var(--green);
+    border-color: #77e5a420;
+    background: #77e5a408;
+}
+
+.ticket-dialog-section {
+    margin-bottom: 18px;
+}
+
+.ticket-dialog-section h3 {
+    margin: 0 0 8px;
+    color: var(--muted);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+}
+
+.ticket-dialog-text {
+    margin: 0;
+    padding: 14px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: #c9d5e5;
+    background: #080e16;
+    font-size: 13px;
+    line-height: 1.7;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
