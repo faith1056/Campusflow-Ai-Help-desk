@@ -1,3 +1,6 @@
+const TICKET_STATUSES = ["Open", "In progress", "Resolved"];
+
+
 // Check how many AI providers have API keys configured.
 async function loadProviderStatus() {
     const statusElement = document.getElementById("provider-status");
@@ -21,6 +24,88 @@ async function loadProviderStatus() {
     } catch (error) {
         console.error("Provider status check failed:", error);
         statusElement.textContent = "Unavailable";
+    }
+}
+
+
+// Return the CSS class that matches a ticket status.
+function statusClass(status) {
+    if (status === "Resolved") {
+        return "resolved";
+    }
+
+    if (status === "In progress") {
+        return "in-progress";
+    }
+
+    return "open";
+}
+
+
+// Build the dropdown used to change a ticket's status.
+function createStatusSelect(ticket) {
+    const currentStatus = TICKET_STATUSES.includes(ticket.status)
+        ? ticket.status
+        : "Open";
+
+    const select = document.createElement("select");
+
+    select.className = `status-select ${statusClass(currentStatus)}`;
+    select.setAttribute("aria-label", `Status for ${ticket.id}`);
+
+    TICKET_STATUSES.forEach((status) => {
+        const option = document.createElement("option");
+
+        option.value = status;
+        option.textContent = status;
+        option.selected = status === currentStatus;
+
+        select.appendChild(option);
+    });
+
+    select.addEventListener("change", () => {
+        changeTicketStatus(ticket.id, select.value, select);
+    });
+
+    return select;
+}
+
+
+// Save a new status for a ticket, then refresh the dashboard.
+async function changeTicketStatus(ticketId, status, select) {
+    select.disabled = true;
+
+    try {
+        const response = await fetch(
+            `/api/tickets/${encodeURIComponent(ticketId)}/status`,
+            {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ status: status })
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || "Unable to update the ticket.");
+        }
+
+        printTerminalMessage(`Updated ${ticketId}: status is now ${status}.`);
+
+        await loadTickets();
+
+    } catch (error) {
+        console.error("Status update failed:", error);
+
+        printTerminalMessage(
+            `Could not update ${ticketId}: ${error.message}`,
+            "error"
+        );
+
+        await loadTickets();
     }
 }
 
@@ -67,8 +152,7 @@ async function loadTickets() {
                 const values = [
                     ticket.id || "N/A",
                     ticket.title || "Untitled",
-                    ticket.ai_provider || "N/A",
-                    ticket.status || "Open"
+                    ticket.ai_provider || "N/A"
                 ];
 
                 values.forEach((value) => {
@@ -76,6 +160,10 @@ async function loadTickets() {
                     cell.textContent = value;
                     row.appendChild(cell);
                 });
+
+                const statusCell = document.createElement("td");
+                statusCell.appendChild(createStatusSelect(ticket));
+                row.appendChild(statusCell);
 
                 tableBody.appendChild(row);
             });
@@ -206,7 +294,8 @@ async function handleCommand(command) {
                     printTerminalMessage(
                         `${ticket.id || "N/A"} | ` +
                         `${ticket.title || "Untitled"} | ` +
-                        `Provider: ${ticket.ai_provider || "N/A"}`
+                        `Provider: ${ticket.ai_provider || "N/A"} | ` +
+                        `Status: ${ticket.status || "Open"}`
                     );
                 });
 

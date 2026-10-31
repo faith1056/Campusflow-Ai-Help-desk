@@ -4,7 +4,12 @@ import os
 from flask import Flask, Response, render_template, request, jsonify
 
 from ai.ai_manager import get_suggestions, AIManagerError
-from storage.tickets import load_tickets, save_ticket
+from storage.tickets import (
+    TicketNotFoundError,
+    load_tickets,
+    save_ticket,
+    update_ticket_status,
+)
 
 
 app = Flask(__name__)
@@ -77,6 +82,32 @@ def get_tickets():
         app.logger.exception("Failed to load tickets")
         return jsonify({
             "error": "Unable to load tickets."
+        }), 500
+
+
+@app.route("/api/tickets/<ticket_id>/status", methods=["PATCH"])
+def update_status(ticket_id):
+    data = request.get_json(silent=True)
+
+    if not isinstance(data, dict):
+        return jsonify({
+            "error": "Request must contain valid JSON."
+        }), 400
+
+    try:
+        ticket = update_ticket_status(ticket_id, data.get("status"))
+        return jsonify({"ticket": ticket}), 200
+
+    except TicketNotFoundError:
+        return jsonify({"error": "Ticket not found."}), 404
+
+    except ValueError as error:
+        return jsonify({"error": str(error)}), 400
+
+    except OSError:
+        app.logger.exception("Failed to update ticket status")
+        return jsonify({
+            "error": "Unable to update the ticket."
         }), 500
 
 

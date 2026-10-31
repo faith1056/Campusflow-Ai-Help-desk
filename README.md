@@ -1,32 +1,34 @@
-# CampusFlow AI Help Desk
+ CampusFlow AI Help Desk
 
 A smarter way to investigate campus IT issues. CampusFlow is a Flask web app where you describe a problem, pick an AI provider, and get practical troubleshooting steps. Each request is saved as a ticket.
 
-Live demo: https://campusflow-ai-help-desk.onrender.com
+Live demo:  https://campusflow-ai-help-desk.onrender.com
 
- The demo runs on Render's free tier. It sleeps after about 15 minutes of inactivity, so the first load can take up to a minute. Saved tickets may reset when the service restarts or redeploys.
+ The demo is password protected. It runs on Render's free tier, so it sleeps after about 15 minutes of inactivity and the first load can take up to a minute.
 
- Features
+## Features
 
 - Dashboard with ticket statistics and AI provider status
 - AI-powered troubleshooting from Google Gemini, Groq, or OpenRouter
-- Ticket creation, saving, and a recent tickets table
+- Ticket creation and a recent tickets table
+- Persistent ticket storage in PostgreSQL (Neon)
+- Password login (HTTP Basic authentication)
 - Command Center, an interactive in-app terminal
 - Responsive dark interface
 
-    Tech stack
+  Tech stack
 
 - Python and Flask
 - Gunicorn for production
+- PostgreSQL on Neon, accessed with psycopg
 - Gemini, Groq, and OpenRouter APIs
 - HTML, CSS, and vanilla JavaScript
-- JSON file storage (tickets.json)
 
- Project structure
+   Project structure
 
 
 Campusflow-Ai-Help-desk/
-├── ai/                 # AI provider integrations
+├── ai/                  AI provider integrations
 │   ├── ai_manager.py
 │   ├── gemini.py
 │   ├── groq.py
@@ -35,15 +37,28 @@ Campusflow-Ai-Help-desk/
 │   ├── css/style.css
 │   └── js/app.js
 ├── storage/
-│   └── tickets.py      # ticket saving and loading
+│   └── tickets.py      # Postgres storage with a JSON file fallback
 ├── templates/
 │   └── index.html
 ├── tests/              # unit tests
-├── app.py              # Flask application
+├── app.py              # Flask application and login
 ├── main.py
 ├── requirements.txt
-└── tickets.json
+└── tickets.json        # used only when DATABASE_URL is not set
+```
 
+   Environment variables
+
+| Variable | Required | Purpose |
+| --- | --- | --- |
+| `GEMINI_API_KEY` | Yes | Google Gemini access |
+| `GROQ_API_KEY` | Yes | Groq access |
+| `OPENROUTER_API_KEY` | Yes | OpenRouter access |
+| `DATABASE_URL` | In production | Postgres connection string. If it is not set, tickets are saved to `tickets.json`. |
+| `APP_USERNAME` | No | Login username (defaults to `admin`) |
+| `APP_PASSWORD` | In production | Login password. If it is not set, the app has no login. |
+
+Never commit real values. The `.env` file is listed in `gitignore`.
 
 ## Run locally
 
@@ -51,27 +66,27 @@ Campusflow-Ai-Help-desk/
    
    git clone https://github.com/faith1056/Campusflow-Ai-Help-desk.git
    cd Campusflow-Ai-Help-desk
-   
+
 
 2. Create and activate a virtual environment:
    
    python -m venv .venv
    source .venv/bin/activate
    
-   On Windows, use venv\Scripts\activate
+   On Windows, use  .venv\Scripts\activate`.
 
 3. Install dependencies:
    
    pip install -r requirements.txt
    
 
-4. Create a  .env file in the project root with your API keys:
+4. Create a  .env file in the project root:
    
    GEMINI_API_KEY=your_key_here
    GROQ_API_KEY=your_key_here
    OPENROUTER_API_KEY=your_key_here
    
-   Never commit this file. It is listed in gitignore
+   Leave out `DATABASE_URL` and `APP_PASSWORD` for local development. Tickets are then saved to `tickets.json` and no login is required.
 
 5. Start the app:
    
@@ -79,32 +94,35 @@ Campusflow-Ai-Help-desk/
    
    Then open http://127.0.0.1:5000.
 
-   Run the tests
-
+## Run the tests
 python -m unittest discover tests
 
 
-    Deploy to Render
+The tests always use the JSON file and never touch the database.
+
+## Deploy to Render
 
 1. Push the project to GitHub.
-2. In Render, create a **New Web Service** and select this repository.
-3. Use these settings:
-   - **Build command:** pip install -r requirements.txt
-   - **Start command:** gunicorn app:app
-4. Under **Environment**, add GEMINI_API_KEY GROQ_API_KEY and OPENROUTER_API_KEY
-5. Deploy. With Auto-Deploy set to On Commit, every push to main redeploys.
+2. Create a free Postgres database on [Neon](https://neon.tech) and copy its connection string. Neon's free database does not expire.
+3. In Render, create a **New Web Service** and select this repository.
+4. Use these settings:
+   - **Build command:** `pip install -r requirements.txt`
+   - **Start command:** `gunicorn app:app`
+5. Under **Environment**, add `GEMINI_API_KEY`, `GROQ_API_KEY`, `OPENROUTER_API_KEY`, `DATABASE_URL`, `APP_USERNAME`, and `APP_PASSWORD`.
+6. Deploy. With Auto-Deploy set to On Commit, every push to `main` redeploys. The `tickets` table is created automatically on first use.
 
-## Known limitations
+ Known limitations
 
-- Tickets are stored in a JSON file, so they are lost when Render's free tier restarts the service. A database such as Postgres would fix this.
-- The app has no login yet, so anyone with the link can use it.
+- The login is one shared username and password, not per-user accounts.
 - AI recommendations are suggestions, not verified diagnoses.
+- Tickets have no status updates yet (every ticket shows as Open).
 
 ## Roadmap
 
-- [ ] Password login
-- [ ] Persistent database storage
+- [x] Password login
+- [x] Persistent database storage
 - [ ] Ticket status updates (open, in progress, resolved)
+- [ ] Per-user accounts
 - [ ] Favicon and further UI polish
 
 ## Author
