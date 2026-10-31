@@ -15,7 +15,8 @@ Live demo:  https://campusflow-ai-help-desk.onrender.com
 - Password login (HTTP Basic authentication)
 - Command Center, an interactive in-app terminal
 - Responsive dark interface
-
+- Ticket detail view with full descriptions and AI suggestions
+- Command Center `view T001` command
   Tech stack
 
 - Python and Flask
@@ -127,6 +128,10 @@ The tests always use the JSON file and never touch the database.
 - [ ] Ticket detail view with full AI suggestions
 - [ ] Search and filter tickets
 - [ ] Per-user accounts
+- [x] Ticket detail view with full AI suggestions
+
+
+
 ## Author
 
 Built by [faith1056](https://github.com/faith1056).
