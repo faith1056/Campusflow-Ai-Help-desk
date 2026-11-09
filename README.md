@@ -72,7 +72,7 @@ Never commit real values. The `.env` file is listed in `.gitignore`.
 
 2. Create and activate a virtual environment:
    ```
-   python -m venv .venv
+   python3 -m venv .venv
    source .venv/bin/activate
    ```
    On Windows, use `.venv\Scripts\activate`.
